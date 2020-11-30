@@ -29,6 +29,15 @@ namespace BlazorApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+                options.InstanceName = "BlazorApp_"; // this prepends the key with this name. 
+                // Eg. If two apps are using the same Redis instance, 
+                // one app could overwrite the key from another applications.
+                // Doing this will avoid conflict.
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
