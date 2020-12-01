@@ -1,7 +1,9 @@
 ﻿@page "/fetchdata"
 
 @using BlazorApp.Data
+@using BlazorApp.Extensions
 @inject WeatherForecastService ForecastService
+@inject IDistributedCache cache
 
 <h1>Weather forecast</h1>
 
@@ -13,6 +15,7 @@
 }
 else
 {
+    <p><em>@loadStatus</em></p>
     <table class="table">
         <thead>
             <tr>
@@ -39,8 +42,33 @@ else
 @code {
     private WeatherForecast[] forecasts;
 
+    private string loadStatus = string.Empty;
+
+    // this happends on page load
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        forecasts = null;
+        loadStatus = string.Empty;
+
+        string recordKey = "WeatherForecast";
+        try
+        {
+            forecasts = await cache.GetRecordAsync<WeatherForecast[]>(recordKey);
+
+            if (forecasts == null)
+            {
+                forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+                loadStatus = $"Loaded from API call";
+                await cache.SetRecordAsync<WeatherForecast[]>(recordKey, forecasts);
+            }
+            else
+            {
+                loadStatus = $"Loaded from cache";
+            }
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

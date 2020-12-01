@@ -32,7 +32,7 @@ namespace BlazorApp
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = Configuration.GetConnectionString("Redis");
+                options.Configuration = Configuration.GetConnectionString("DockerToRedis");
                 options.InstanceName = "BlazorApp_"; // this prepends the key with this name. 
                 // Eg. If two apps are using the same Redis instance, 
                 // one app could overwrite the key from another applications.
